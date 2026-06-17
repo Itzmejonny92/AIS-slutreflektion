@@ -517,7 +517,7 @@
           </div>
           <div class="attendance-item">
             <span class="attendance-label">Labb 2</span>
-            <span class="attendance-value">AI-detektion</span>
+            <span class="attendance-value">OT/ICS</span>
           </div>
           <div class="attendance-item">
             <span class="attendance-label">Grupp</span>
@@ -545,9 +545,9 @@
           <p>
             Det som gjorde störst skillnad för mig var kombinationen av praktiska labbar och gruppprojektet. I labb 1
             byggde jag grunden med Wazuh, Docker, Python, tcpdump, Wireshark och en strukturerad labbmiljö. I labb 2
-            gick fokus mer mot AI-driven anomalidetektion och hur modeller kan användas som stöd i säkerhetsarbete.
-            Gruppprojektet knöt sedan ihop detta genom en ML-baserad nätverksanomali-detektor med modellträning,
-            robusthetstest och SIEM/SOAR-integration.
+            arbetade jag med en industriell vattenreningsmiljö där PLC, HMI, Modbus TCP, segmentering, Suricata och
+            incidentrespons behövde kopplas ihop. Gruppprojektet knöt sedan ihop kursens AI-spår genom en ML-baserad
+            nätverksanomali-detektor med modellträning, robusthetstest och SIEM/SOAR-integration.
           </p>
         </div>
       </section>
@@ -621,25 +621,39 @@
       </section>
 
       <section>
-        <h2>4. Labb 2 - AI-driven anomalidetektion</h2>
+        <h2>4. Labb 2 - industriell säkerhet och OT-incidentrespons</h2>
         <p>
-          Labb 2 blev för mig steget från klassisk övervakning till mer beteendebaserad analys. Där labb 1 handlade om
-          att samla in och strukturera säkerhetsdata, handlade labb 2 mer om hur avvikelser kan upptäckas genom mönster
-          i data. Jag kopplar det särskilt till Python och scikit-learn, där vi verifierade att ML-miljön fungerade och
-          kunde användas för enklare anomalidetektion.
+          Labb 2 blev kursens tydligaste skillnad mellan vanlig IT-säkerhet och OT-säkerhet. Miljön var en simulerad
+          vattenreningsprocess där en PLC styrde processvärden, en HMI läste dem via Modbus TCP och en angripare kunde
+          försöka påverka processen. Det gjorde säkerheten mer konkret: en write mot ett register är inte bara ett
+          datapaket, utan kan motsvara ändrad setpoint, ventilstatus eller annan påverkan på en fysisk process.
         </p>
         <p>
-          Den största skillnaden mot regelbaserad detektion är att AI inte behöver börja med en färdig regel för varje
-          hot. En modell kan i stället lära sig normalitet eller klassificera trafik utifrån features. Samtidigt blev
-          det tydligt att AI inte automatiskt gör säkerhetsarbetet enklare. Modellen behöver bra data, rimliga features,
-          rätt mätvärden och en människa som förstår begränsningarna. En alert från en modell är inte ett facit, utan
-          ett beslutsstöd.
+          I första delen kartlade jag arkitekturen: PLC `10.0.50.10`, HMI `10.0.50.20`, Modbus-port `502`, holding
+          registers `HR0` till `HR3` och coils `CO0` till `CO1`. Jag lärde mig särskilt skillnaden mellan normal
+          `FC3`-läsning och misstänkta writes som `FC5`, `FC6` och `FC16`. Den skillnaden blev en nyckel för resten av
+          labben, eftersom HMI:n normalt bara läser processvärden. När någon skriver till PLC:n är det därför en stark
+          attacksignal i just den här miljön.
         </p>
         <p>
-          Det här ändrade min syn på AI i säkerhet. Innan kursen tänkte jag mer på AI som ett sätt att "hitta hot".
-          Efter labbarna tänker jag mer på AI som en förstärkning av analytikerns förmåga att prioritera, jämföra och
-          se mönster i stora datamängder. Det är kraftfullt, men bara om man samtidigt bygger in transparens,
-          verifiering och möjlighet att agera på resultatet.
+          Del 2 gjorde attackytan mindre genom IT/DMZ/OT-segmentering. Den viktigaste bristen var att attacker-host var
+          dual-homed och kunde nå OT direkt. Genom att ta bort OT-nätet från `attacker` blockerades direktvägen till
+          `mock-plc:502`, samtidigt som jump-server och historian fortfarande hade definierade vägar. Det gav mig en
+          praktisk förståelse för IEC 62443-tänk med zoner och conduits: säkerhet handlar inte bara om att blockera
+          allt, utan om att tillåta rätt flöden på kontrollerade sätt.
+        </p>
+        <p>
+          Del 3 och 4 visade varför segmentering inte räcker ensam. När jump-servern simulerades som komprometterad
+          kunde den användas som legitim pivot in i OT. Suricata-reglerna gjorde då attackerna synliga: `FC6`,
+          `FC16`, `FC8 Diagnostics`, nya Modbus-sessioner och osäkra setpoint-värden över `8000`. I incidentövningen
+          behövde jag sedan tänka som i en riktig OT-respons: identifiera angripar-IP, nödåterställa PLC-värden,
+          isolera jump-servern utan att stoppa HMI:n, samla bevis och lägga till förbättrad recon-detektion.
+        </p>
+        <p>
+          Min viktigaste reflektion från labb 2 är att OT-incidentrespons måste väga cybersäkerhet mot processäkerhet.
+          I en IT-miljö kan snabb isolering ofta vara rätt första åtgärd. I OT kan samma åtgärd bli farlig om den
+          gör att operatören tappar sikt över processen. Det gjorde att jag började tänka mer på säkerhet som styrda
+          beslut under begränsningar, inte bara tekniska kontroller.
         </p>
       </section>
 
@@ -770,9 +784,9 @@
         <h2>9. Slutsats</h2>
         <p>
           AIS-kursen har gett mig en mer komplett bild av säkerhetsövervakning. Labb 1 gav grunden i centraliserad
-          övervakning och praktisk miljöhantering. Labb 2 fördjupade min förståelse för AI-driven anomalidetektion.
-          Gruppprojektet visade hur dessa delar kan kopplas ihop i ett konkret system med dataset, modelljämförelse,
-          adversarial robusthetstest och SIEM/SOAR-integration.
+          övervakning och praktisk miljöhantering. Labb 2 gav praktisk förståelse för OT/ICS, Modbus, segmentering,
+          Suricata och incidentrespons. Gruppprojektet visade hur AI-spåret kan kopplas ihop i ett konkret system med
+          dataset, modelljämförelse, adversarial robusthetstest och SIEM/SOAR-integration.
         </p>
         <p>
           Min största utveckling är att jag inte längre ser säkerhetsverktyg som isolerade komponenter. Jag ser dem som
@@ -782,13 +796,13 @@
         </p>
         <div class="course-goals">
           <p><strong>Reflektion över kursen:</strong> Jag kopplar SIEM, AI, OT, Zero Trust, adversarial ML och SOC-arbete till en gemensam säkerhetslivscykel.</p>
-          <p><strong>Egna erfarenheter:</strong> Jag beskriver lärdomar från WSL/Docker/Wazuh, AI-labbmiljö och min integrationsroll i gruppprojektet.</p>
+          <p><strong>Egna erfarenheter:</strong> Jag beskriver lärdomar från WSL/Docker/Wazuh, OT-labbmiljö och min integrationsroll i gruppprojektet.</p>
           <p><strong>Framtidsperspektiv:</strong> Jag diskuterar AI som beslutsstöd i framtidens säkerhetsarbete, med fokus på både potential och risker.</p>
         </div>
       </section>
 
       <footer>
-        Rapporten baseras på AIS-kursens innehåll vecka 1-11, labb 1-materialet, AI/anomalidetektionsmomentet och gruppprojektet ML Network Anomaly Detector.
+        Rapporten baseras på AIS-kursens innehåll vecka 1-11, labb 1, labb 2 och gruppprojektet ML Network Anomaly Detector.
       </footer>
     </main>
   </article>
