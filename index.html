@@ -199,6 +199,47 @@
       display: block;
     }
 
+    .link-menu {
+      position: relative;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .link-menu summary {
+      list-style: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-strong);
+    }
+
+    .link-menu summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .link-menu[open] summary {
+      margin-bottom: 8px;
+    }
+
+    .link-menu-panel {
+      min-width: 210px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    }
+
+    .link-menu-panel a {
+      display: block;
+      margin: 6px 0;
+      text-decoration: none;
+    }
+
+    .link-menu-panel a:hover {
+      text-decoration: underline;
+    }
+
     .meta-key,
     .attendance-label {
       color: var(--muted);
@@ -485,7 +526,13 @@
       <div class="meta">
         <div class="meta-card">
           <span class="meta-key">Student</span>
-          <span class="meta-value">Jonny Nguyen</span>
+          <details class="link-menu">
+            <summary>Jonny Nguyen</summary>
+            <div class="link-menu-panel">
+              <a href="https://github.com/Itzmejonny92" target="_blank" rel="noopener noreferrer">GitHub-konto</a>
+              <a href="https://github.com/Itzmejonny92/AIS-slutreflektion" target="_blank" rel="noopener noreferrer">Slutreflektion-repo</a>
+            </div>
+          </details>
         </div>
         <div class="meta-card">
           <span class="meta-key">Kurs</span>
@@ -521,11 +568,13 @@
           </div>
           <div class="attendance-item">
             <span class="attendance-label">Grupp</span>
-            <span class="attendance-value">M4K Gang</span>
-          </div>
-          <div class="attendance-item">
-            <span class="attendance-label">Slutformat</span>
-            <span class="attendance-value">PDF</span>
+            <details class="link-menu">
+              <summary>M4K Gang</summary>
+              <div class="link-menu-panel">
+                <a href="https://m4k-reflect.vercel.app" target="_blank" rel="noopener noreferrer">Projektwebb</a>
+                <a href="https://github.com/Mattej-Petrovic/M4K-Pipeline" target="_blank" rel="noopener noreferrer">GitHub-repo</a>
+              </div>
+            </details>
           </div>
         </div>
       </div>
