@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIS slutreflektion - Jonny Nguyen</title>
+  <style>
+    :root {
+      --bg: #101416;
+      --paper: #182024;
+      --ink: #eef5f2;
+      --muted: #b8c8c1;
+      --line: #365057;
+      --accent: #2aa198;
+      --accent-soft: #173533;
+      --accent-strong: #7ee0d4;
+      --warm: #202827;
+      --good: #172a22;
+      --header-bg: #16272b;
+      --panel: #172125;
+      --panel-soft: #1b292d;
+      --panel-strong: #1c3032;
+      --panel-alt: #152326;
+      --table-head: #20363b;
+      --table-cell: #182529;
+      --meta-bg: rgba(21, 34, 38, 0.94);
+      --journey-border: #40867f;
+      --journey-ink: #b9fff5;
+      --success-border: #508563;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+    }
+
+    html[data-theme="light"] {
+      --bg: #eef3f2;
+      --paper: #fffdf9;
+      --ink: #17201f;
+      --muted: #566864;
+      --line: #c9d8d5;
+      --accent: #1d837c;
+      --accent-soft: #e3f4f1;
+      --accent-strong: #136e68;
+      --warm: #edf4f1;
+      --good: #edf7ef;
+      --header-bg: #e8f4f2;
+      --panel: #f8fffd;
+      --panel-soft: #f0fbf8;
+      --panel-strong: #e8f6f3;
+      --panel-alt: #f4fbfa;
+      --table-head: #e5f3f0;
+      --table-cell: #fbfffe;
+      --meta-bg: rgba(248, 255, 253, 0.96);
+      --journey-border: #8bc9c2;
+      --journey-ink: #0d625d;
+      --success-border: #93bd9c;
+      --shadow: 0 18px 40px rgba(18, 36, 34, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at top right, rgba(42, 161, 152, 0.16), transparent 24%),
+        radial-gradient(circle at top left, rgba(126, 224, 212, 0.08), transparent 22%),
+        linear-gradient(180deg, #0c1112 0%, var(--bg) 100%);
+      color: var(--ink);
+      font: 17px/1.82 Georgia, "Times New Roman", serif;
+    }
+
+    body {
+      padding: 28px 16px 48px;
+    }
+
+    .toolbar {
+      width: min(980px, 100%);
+      margin: 0 auto 12px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .theme-toggle {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font: 600 0.92rem/1.2 Georgia, "Times New Roman", serif;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .theme-toggle:hover,
+    .to-top:hover {
+      transform: translateY(-1px);
+    }
+
+    .to-top {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      z-index: 20;
+      width: 52px;
+      height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--accent-strong);
+      font: 700 1.5rem/1 Georgia, "Times New Roman", serif;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+      cursor: pointer;
+    }
+
+    a {
+      color: var(--accent-strong);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .page {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 44px 56px 30px;
+      background: linear-gradient(180deg, var(--header-bg) 0%, var(--paper) 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(2.1rem, 4.5vw, 3.1rem);
+      line-height: 1.1;
+    }
+
+    .lead {
+      max-width: 780px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .meta,
+    .attendance-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .meta {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .attendance-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      margin-top: 14px;
+    }
+
+    .meta-card,
+    .attendance-item {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--meta-bg);
+    }
+
+    .meta-card span,
+    .attendance-item span {
+      display: block;
+    }
+
+    .meta-key,
+    .attendance-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .meta-value,
+    .attendance-value {
+      margin-top: 4px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .attendance-card {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--panel-soft) 0%, var(--panel) 100%);
+    }
+
+    .attendance-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .attendance-title {
+      margin: 0;
+      font-size: 1.08rem;
+      color: var(--accent-strong);
+    }
+
+    main {
+      padding: 34px 56px 58px;
+    }
+
+    h2 {
+      margin: 34px 0 14px;
+      font-size: 1.85rem;
+      line-height: 1.18;
+    }
+
+    h3 {
+      margin: 26px 0 10px;
+      font-size: 1.28rem;
+      color: var(--accent-strong);
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul {
+      margin: 10px 0 14px 22px;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .summary-box,
+    .course-goals,
+    .quote,
+    .week-card,
+    .timeline {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    .summary-box {
+      padding: 18px 20px;
+      background: var(--panel-soft);
+    }
+
+    .journey {
+      margin: 18px 0 8px;
+      padding: 16px 18px;
+      border: 1px dashed var(--journey-border);
+      border-radius: 10px;
+      background: var(--panel-alt);
+      color: var(--journey-ink);
+      font: 600 0.98rem/1.6 "Consolas", "Courier New", monospace;
+      white-space: pre-wrap;
+    }
+
+    .timeline {
+      margin-top: 18px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      background: var(--table-head);
+      font-size: 0.92rem;
+    }
+
+    td {
+      background: var(--table-cell);
+    }
+
+    .weeks {
+      display: grid;
+      gap: 16px;
+    }
+
+    .week-card {
+      padding: 18px 20px;
+      background: var(--panel);
+    }
+
+    .week-card strong,
+    .metric {
+      color: var(--accent-strong);
+    }
+
+    .quote {
+      margin: 18px 0;
+      padding: 20px 22px;
+      background: var(--panel-strong);
+      border-left: 4px solid var(--accent);
+      font-style: italic;
+    }
+
+    .course-goals {
+      padding: 18px 20px;
+      background: var(--good);
+      border-color: var(--success-border);
+    }
+
+    footer {
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 880px) {
+      header,
+      main {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .attendance-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 14px 10px 30px;
+      }
+
+      header,
+      main {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.55rem;
+      }
+
+      .timeline {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 620px;
+      }
+
+      .attendance-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 10px 8px 24px;
+      }
+
+      .page {
+        border-radius: 12px;
+      }
+
+      header,
+      main {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .meta,
+      .attendance-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-toggle {
+        width: 100%;
+      }
+
+      .to-top {
+        left: 12px;
+        bottom: 12px;
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: white;
+      }
+
+      .toolbar,
+      .to-top {
+        display: none;
+      }
+
+      .page {
+        width: 100%;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      header,
+      main {
+        padding-left: 36px;
+        padding-right: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Byt färgtema">Light mode</button>
+  </div>
+  <button class="to-top" id="toTopButton" type="button" aria-label="Till toppen">↑</button>
+
+  <article class="page">
+    <header>
+      <div class="eyebrow">Individuell slutreflektion av Jonny Nguyen ITSX25</div>
+      <h1>Min utveckling under kursen Nätverks-, OT- och AI-säkerhet</h1>
+      <p class="lead">
+        Den här rapporten är min individuella reflektion över AIS-kursen. Fokus ligger inte bara på vad vi har gjort,
+        utan på hur min syn på modern säkerhetsövervakning har förändrats: från regelbaserad detektion och SIEM till
+        AI-driven anomalidetektion, adversarial ML, OT-perspektiv och ett mer sammanhängande arbetssätt för detect,
+        analyze och respond.
+      </p>
+
+      <div class="meta">
+        <div class="meta-card">
+          <span class="meta-key">Student</span>
+          <span class="meta-value">Jonny Nguyen</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-key">Kurs</span>
+          <span class="meta-value">Nätverks-, OT- och AI-säkerhet</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-key">Projekt</span>
+          <span class="meta-value">ML Network Anomaly Detector</span>
+        </div>
+        <div class="meta-card">
+          <span class="meta-key">Period</span>
+          <span class="meta-value">Vecka 1-11</span>
+        </div>
+      </div>
+
+      <div class="attendance-card" aria-label="Rapportöversikt">
+        <div class="attendance-header">
+          <h2 class="attendance-title">Rapportkrav</h2>
+          <span class="attendance-rate">Individuell reflektion, svenska, 2000-3000 ord</span>
+        </div>
+        <div class="attendance-grid">
+          <div class="attendance-item">
+            <span class="attendance-label">Fokus</span>
+            <span class="attendance-value">Reflektion</span>
+          </div>
+          <div class="attendance-item">
+            <span class="attendance-label">Labb 1</span>
+            <span class="attendance-value">SIEM/Wazuh</span>
+          </div>
+          <div class="attendance-item">
+            <span class="attendance-label">Labb 2</span>
+            <span class="attendance-value">AI-detektion</span>
+          </div>
+          <div class="attendance-item">
+            <span class="attendance-label">Grupp</span>
+            <span class="attendance-value">M4K Gang</span>
+          </div>
+          <div class="attendance-item">
+            <span class="attendance-label">Slutformat</span>
+            <span class="attendance-value">PDF</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <h2>1. Inledning</h2>
+        <div class="summary-box">
+          <p>
+            När kursen började såg jag säkerhetsövervakning ganska mycket som en teknisk kedja av verktyg: loggar in,
+            regler körs, alerts kommer ut. Efter kursen ser jag det mer som ett arbetsflöde där teknik, analys,
+            riskbedömning och respons måste hänga ihop. Det räcker inte att ett verktyg kan upptäcka något. Det måste
+            också gå att förstå varför det upptäcktes, hur säkert resultatet är, vad nästa steg blir och vilka
+            begränsningar som finns.
+          </p>
+          <p>
+            Det som gjorde störst skillnad för mig var kombinationen av praktiska labbar och gruppprojektet. I labb 1
+            byggde jag grunden med Wazuh, Docker, Python, tcpdump, Wireshark och en strukturerad labbmiljö. I labb 2
+            gick fokus mer mot AI-driven anomalidetektion och hur modeller kan användas som stöd i säkerhetsarbete.
+            Gruppprojektet knöt sedan ihop detta genom en ML-baserad nätverksanomali-detektor med modellträning,
+            robusthetstest och SIEM/SOAR-integration.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h2>2. Översikt av min resa</h2>
+        <p>
+          Kursens progression blev tydlig först när jag tittade bakåt. Vi började med centraliserad övervakning,
+          fortsatte mot AI och nätverksanalys, gick vidare genom OT/ICS, Zero Trust, container- och molnsäkerhet,
+          adversarial ML och avslutade med AI i SOC och grupppresentation. Det gav en bred bild av säkerhet som både
+          teknik och arbetssätt.
+        </p>
+        <div class="journey">SIEM och Wazuh -> nätverksdata -> AI-driven anomalidetektion -> OT/ICS -> Zero Trust -> container- och molnsäkerhet -> adversarial ML -> AI i SOC -> gruppprojekt och reflektion</div>
+        <div class="timeline">
+          <table>
+            <thead>
+              <tr>
+                <th>Fas</th>
+                <th>Praktiskt fokus</th>
+                <th>Min viktigaste lärdom</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Grund</td>
+                <td>Wazuh, Docker, Git, Python, tcpdump</td>
+                <td>En fungerande analysmiljö kräver ordning i både verktyg, repo och verifiering.</td>
+              </tr>
+              <tr>
+                <td>Detektion</td>
+                <td>Regler, loggar, features och nätverksflöden</td>
+                <td>Detektion är alltid en tolkning av signaler, inte en absolut sanning.</td>
+              </tr>
+              <tr>
+                <td>AI och ML</td>
+                <td>Modellträning, F1, recall, robusthet</td>
+                <td>Accuracy räcker inte i säkerhet; falska negativa och manipulerbarhet är avgörande.</td>
+              </tr>
+              <tr>
+                <td>Drift och respons</td>
+                <td>SIEM/SOAR, alerts, incidenttänk</td>
+                <td>Värdet uppstår först när resultatet går att använda i ett tydligt responsflöde.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Labb 1 - centraliserad säkerhetsövervakning</h2>
+        <p>
+          Labb 1 var viktig eftersom den gav mig den praktiska basen för resten av kursen. Jag arbetade i WSL på min
+          ThinkPad och verifierade att Git, Python 3, Wireshark, tcpdump, Docker och Docker Compose fungerade. Jag
+          satte också upp GitHub SSH och flyttade repot från HTTPS till SSH. Det låter som miljöarbete, men för mig
+          blev det en tydlig första lärdom: säkerhetsarbete börjar ofta med att miljön är reproducerbar och att
+          verktygen faktiskt går att lita på.
+        </p>
+        <p>
+          Den centrala delen i labben var Wazuh-stacken med manager, indexer och dashboard. Arkitekturen gjorde det
+          lättare att förstå varför SIEM inte bara är en loggdatabas. Wazuh-manager hanterar regler och agenter,
+          indexern gör data sökbar och dashboarden ger analystöd. När jag kopplade detta till egna scripts och
+          dokumentation började jag se hur en SOC-analytiker behöver röra sig mellan rå data, filtrering, visualisering
+          och beslut.
+        </p>
+        <p>
+          En personlig insikt från labb 1 var att verktyg som Wazuh blir starka först när man har en tydlig tanke om
+          vilka händelser som är viktiga. Annars riskerar man att samla mycket data utan att skapa användbar kunskap.
+          Jag tar också med mig att felsökningen var en del av lärandet. Docker credential-problem i WSL och saknade
+          images var inte sidospår, utan realistiska exempel på hur mycket praktisk drift påverkar säkerhetsarbete.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Labb 2 - AI-driven anomalidetektion</h2>
+        <p>
+          Labb 2 blev för mig steget från klassisk övervakning till mer beteendebaserad analys. Där labb 1 handlade om
+          att samla in och strukturera säkerhetsdata, handlade labb 2 mer om hur avvikelser kan upptäckas genom mönster
+          i data. Jag kopplar det särskilt till Python och scikit-learn, där vi verifierade att ML-miljön fungerade och
+          kunde användas för enklare anomalidetektion.
+        </p>
+        <p>
+          Den största skillnaden mot regelbaserad detektion är att AI inte behöver börja med en färdig regel för varje
+          hot. En modell kan i stället lära sig normalitet eller klassificera trafik utifrån features. Samtidigt blev
+          det tydligt att AI inte automatiskt gör säkerhetsarbetet enklare. Modellen behöver bra data, rimliga features,
+          rätt mätvärden och en människa som förstår begränsningarna. En alert från en modell är inte ett facit, utan
+          ett beslutsstöd.
+        </p>
+        <p>
+          Det här ändrade min syn på AI i säkerhet. Innan kursen tänkte jag mer på AI som ett sätt att "hitta hot".
+          Efter labbarna tänker jag mer på AI som en förstärkning av analytikerns förmåga att prioritera, jämföra och
+          se mönster i stora datamängder. Det är kraftfullt, men bara om man samtidigt bygger in transparens,
+          verifiering och möjlighet att agera på resultatet.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Gruppprojektet - ML Network Anomaly Detector</h2>
+        <div class="weeks">
+          <section class="week-card">
+            <h3>Problem och arkitektur</h3>
+            <p>
+              Gruppprojektet blev kursens mest konkreta sammanfattning. Vi byggde ett system som genererar syntetiska
+              nätverksflöden, tränar modeller, testar robusthet och skickar detekterade attacker vidare som strukturerade
+              alerts. Dataflödet var tydligt: <strong>generate_data.py</strong> skapade datasetet, <strong>train.py</strong>
+              tränade och jämförde modeller, <strong>attack.py</strong> testade adversarial evasion och
+              <strong>siem_alert.py</strong> kopplade modellens prediktion till SIEM/SOAR-tänk.
+            </p>
+            <p>
+              Datasetet bestod av <span class="metric">2 000</span> syntetiska flöden: 1 400 normala och 600 attacker
+              fördelade på portskanning, DDoS och lateral förflyttning. Vi använde tio features, bland annat
+              packet_rate, distinct_ports, failed_conn_ratio, ttl_mean och inter_arrival_time. En fast seed gjorde
+              resultatet reproducerbart, men vi var också tydliga med att syntetisk data inte är samma sak som verklig
+              nätverkstrafik.
+            </p>
+          </section>
+
+          <section class="week-card">
+            <h3>Modellresultat och mätvärden</h3>
+            <p>
+              Vi jämförde Logistic Regression, Random Forest och Gradient Boosting. Random Forest valdes eftersom den
+              gav bäst sammanvägd klassificeringsprestanda med <span class="metric">96,0 % accuracy</span>,
+              <span class="metric">0,9815 precision</span>, <span class="metric">0,8833 recall</span> och
+              <span class="metric">0,9298 F1</span> för attackklassen. Det resultatet var starkt, men det viktigaste
+              för mig var diskussionen om vad siffrorna betyder.
+            </p>
+            <p>
+              I säkerhet är ett missat angrepp ofta mer allvarligt än ett falsklarm, men för många falsklarm kan också
+              göra att analytiker slutar lita på systemet. Därför blev precision, recall och F1 mer meningsfulla än
+              bara accuracy. Jag lärde mig också att ett bra resultat på testdata inte automatiskt betyder att modellen
+              är säker, robust eller redo för produktion.
+            </p>
+          </section>
+
+          <section class="week-card">
+            <h3>Min del: integration, testning och dokumentation</h3>
+            <p>
+              Min egen huvuddel i gruppen var integration, testning, dokumentation och demo. Jag arbetade med
+              <strong>siem_alert.py</strong>, där modellens prediktion omvandlas till en strukturerad JSON-alert och
+              kan skickas via UDP-syslog eller HTTP-webhook. Normal trafik undertrycks, medan attackflöden skapar en
+              alert med timestamp, källa, allvarlighetsgrad, prediktion, confidence och nätverksfeatures.
+            </p>
+            <p>
+              Det jag tar med mig från den delen är att ML inte skapar värde i isolering. En modell som bara skriver
+              "attack" i terminalen är en demo. En modell som kan kopplas till ett alertflöde, testas end-to-end och
+              dokumenteras så att andra förstår den börjar likna ett säkerhetsverktyg. Jag märkte också hur viktigt det
+              är att integrationstestning sker efter varje större förändring, eftersom ändringar i dataset eller modell
+              påverkar både robusthet, dokumentation och alertlogik.
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <section>
+        <h2>6. AI:s roll i framtidens säkerhetsarbete</h2>
+        <p>
+          Min bild av AI i cybersäkerhet har blivit mer nyanserad. Jag ser fortfarande stor potential, särskilt i SOC-
+          arbete där mängden loggar och händelser kan bli för stor för manuell granskning. AI kan hjälpa till att
+          prioritera alerts, hitta mönster, sammanfatta incidenter och ge analytikern bättre underlag. Men kursen har
+          också gjort det tydligt att AI inte ersätter säkerhetsförståelse.
+        </p>
+        <p>
+          Gruppprojektets robusthetstest visade detta tydligt. Random Forest hade bäst accuracy, men Gradient Boosting
+          var marginellt svårare att lura i vårt evasion-test. Logistic Regression flippade vid 40,0 %, Random Forest
+          vid 47,5 % och Gradient Boosting vid 49,0 % när attackflödet drogs mot normal trafik. Det betyder att
+          modellkvalitet och säkerhet inte är samma sak. Om man bara väljer modell efter accuracy kan man missa
+          säkerhetsegenskaper som är helt avgörande i verklig drift.
+        </p>
+        <p>
+          Jag tycker därför att framtidens säkerhetsarbete behöver kombinera AI med klassiska principer: defense in
+          depth, tydliga processer, logging, mänsklig granskning och incidentrespons. AI kan förstärka SOC:en, men den
+          måste övervakas precis som andra säkerhetssystem. Modeller behöver data governance, versionshantering,
+          driftövervakning, återträning och skydd mot poisoning, evasion och manipulation av modellfiler.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. OT, Zero Trust och helhetsperspektiv</h2>
+        <p>
+          OT- och ICS-delarna i kursen breddade min förståelse för säkerhet. I vanlig IT kan man ofta patcha, starta
+          om och automatisera snabbare. I OT-miljöer kan tillgänglighet och fysisk säkerhet väga tyngre än snabb
+          förändring. Purdue-modellen och industriella protokoll gjorde det tydligt att säkerhetsåtgärder måste passa
+          miljön. Samma kontroll kan vara rimlig i ett molnkluster men riskabel i en produktionsmiljö.
+        </p>
+        <p>
+          Zero Trust gav ett kompletterande perspektiv. Jag ser det inte längre som ett modeord, utan som en praktisk
+          princip: lita inte automatiskt på nätverksposition, verifiera åtkomst kontinuerligt och begränsa rörelse i
+          miljön. I relation till gruppprojektet betyder det att en ML-detektor inte ska vara det enda skyddet. Om en
+          attack missas behöver andra lager, som segmentering, identitet, least privilege och övervakning, fortfarande
+          minska skadan.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Egna erfarenheter och framtida yrkesroll</h2>
+        <div class="quote">
+          Den viktigaste lärdomen för mig är att modern säkerhet inte handlar om att välja mellan regler, AI eller
+          människor. Det handlar om att bygga ett flöde där varje del hjälper nästa del att fatta bättre beslut.
+        </div>
+        <p>
+          Personligen har kursen gjort mig tryggare i att arbeta metodiskt. Jag har blivit bättre på att dokumentera,
+          verifiera, felsöka och förklara tekniska beslut. I början låg mycket fokus på att få kommandon och verktyg
+          att fungera. Mot slutet kunde jag tydligare resonera om varför en lösning var rimlig, vilka risker den hade
+          och vad som skulle krävas för att ta den närmare produktion.
+        </p>
+        <p>
+          I en framtida yrkesroll inom cybersäkerhet ser jag att jag vill arbeta nära gränsen mellan teknik och analys.
+          SOC Analyst, Security Engineer eller en roll med fokus på detection engineering känns mer konkreta efter den
+          här kursen. Gruppprojektet visade mig att jag trivs med integrationsdelen: att få data, modell, alertflöde,
+          testning och dokumentation att hänga ihop så att lösningen blir användbar för andra.
+        </p>
+        <p>
+          Jag tar också med mig en ödmjukhet inför AI. Det är lätt att imponeras av en hög siffra i en modellrapport,
+          men i säkerhet måste man alltid fråga vad modellen inte ser, hur den kan luras och hur människor ska agera
+          när den larmar. Den frågan vill jag fortsätta bära med mig, eftersom den gör AI till ett verktyg i ett
+          större säkerhetsarbete i stället för ett svart låda-beslut.
+        </p>
+      </section>
+
+      <section>
+        <h2>9. Slutsats</h2>
+        <p>
+          AIS-kursen har gett mig en mer komplett bild av säkerhetsövervakning. Labb 1 gav grunden i centraliserad
+          övervakning och praktisk miljöhantering. Labb 2 fördjupade min förståelse för AI-driven anomalidetektion.
+          Gruppprojektet visade hur dessa delar kan kopplas ihop i ett konkret system med dataset, modelljämförelse,
+          adversarial robusthetstest och SIEM/SOAR-integration.
+        </p>
+        <p>
+          Min största utveckling är att jag inte längre ser säkerhetsverktyg som isolerade komponenter. Jag ser dem som
+          delar av en kedja: samla data, förstå beteende, upptäck avvikelser, bedöm risk, skapa alert, agera och lär av
+          resultatet. AI kan göra kedjan snabbare och starkare, men bara om den kombineras med mätbarhet, transparens,
+          mänsklig granskning och tydliga processer.
+        </p>
+        <div class="course-goals">
+          <p><strong>Reflektion över kursen:</strong> Jag kopplar SIEM, AI, OT, Zero Trust, adversarial ML och SOC-arbete till en gemensam säkerhetslivscykel.</p>
+          <p><strong>Egna erfarenheter:</strong> Jag beskriver lärdomar från WSL/Docker/Wazuh, AI-labbmiljö och min integrationsroll i gruppprojektet.</p>
+          <p><strong>Framtidsperspektiv:</strong> Jag diskuterar AI som beslutsstöd i framtidens säkerhetsarbete, med fokus på både potential och risker.</p>
+        </div>
+      </section>
+
+      <footer>
+        Rapporten baseras på AIS-kursens innehåll vecka 1-11, labb 1-materialet, AI/anomalidetektionsmomentet och gruppprojektet ML Network Anomaly Detector.
+      </footer>
+    </main>
+  </article>
+
+  <script>
+    (function () {
+      const storageKey = "jonny-ais-report-theme";
+      const root = document.documentElement;
+      const button = document.getElementById("themeToggle");
+      const toTopButton = document.getElementById("toTopButton");
+
+      function setTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        button.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+      }
+
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme === "light" || savedTheme === "dark") {
+        setTheme(savedTheme);
+      } else {
+        setTheme("dark");
+      }
+
+      button.addEventListener("click", function () {
+        const nextTheme = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        setTheme(nextTheme);
+        localStorage.setItem(storageKey, nextTheme);
+      });
+
+      toTopButton.addEventListener("click", function () {
+        const startY = window.scrollY;
+        const duration = 700;
+        const startTime = performance.now();
+
+        function easeOutCubic(progress) {
+          return 1 - Math.pow(1 - progress, 3);
+        }
+
+        function step(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          window.scrollTo(0, Math.round(startY * (1 - eased)));
+
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        }
+
+        window.requestAnimationFrame(step);
+      });
+    }());
+  </script>
+</body>
+</html>
