@@ -1,40 +1,61 @@
-# AIS slutreflektion
+# Individuell slutreflektion - AIS
 
-Det här repot innehåller min individuella slutreflektion för kursen
-**Nätverks-, OT- och AI-säkerhet** på Chas Academy.
+## Inlämningsinformation
 
-Rapporten är skriven på svenska och bygger på kursens labbar, gruppprojektet
-**ML Network Anomaly Detector** och min egen reflektion kring säkerhetsarbete,
-AI, OT/ICS, SIEM, detektion och incidentrespons.
+**Student:** Jonny Nguyen  
+**Kurs:** Nätverks-, OT- och AI-säkerhet  
+**Utbildning:** Chas Academy, ITSX25  
+**Inlämning:** Individuell slutreflektion  
+**Språk:** Svenska  
+**Format:** HTML, avsedd att kunna exporteras till PDF från webbläsaren
 
-## Innehåll
+## Syfte
 
-- `index.html` - slutreflektionen i HTML-format
-- README.md - kort beskrivning av repot
+Detta repo innehåller min individuella slutreflektion för kursen
+**Nätverks-, OT- och AI-säkerhet**. Rapporten reflekterar över kursens centrala
+moment och kopplar dem till mina egna erfarenheter, min framtida yrkesroll och
+AI:s roll i modernt säkerhetsarbete.
 
-## Öppna rapporten
+Fokus ligger på reflektion snarare än en ren sammanfattning. Rapporten behandlar
+bland annat centraliserad säkerhetsövervakning, OT/ICS-säkerhet,
+incidentrespons, AI-driven anomalidetektion, adversarial ML och praktisk
+SIEM/SOAR-integration.
 
-Från WSL/VS Code:
+## Leverans
 
-```bash
-cd "/home/jonny-nguyen/AIS slutreflektion"
-code .
-```
+Huvudfilen för inlämningen är:
 
-Öppna sedan `index.html` i webbläsaren. Rapporten är byggd för att kunna
-skrivas ut eller sparas som PDF från webbläsarens utskriftsfunktion.
+- `index.html` - individuell slutreflektion i HTML-format
+
+Rapporten kan öppnas direkt i en webbläsare och därefter sparas som PDF via
+webbläsarens utskriftsfunktion.
 
 ## Källmaterial
 
-Rapporten utgår från:
+Reflektionen bygger på följande kursmoment och projekt:
 
-- `ais-lab1` - centraliserad säkerhetsövervakning med Wazuh
-- `ais-lab2` - OT/ICS-labb med Modbus, segmentering, Suricata och incidentrespons
-- `ML-Network-Anomaly-Detector` - gruppprojekt med ML-baserad nätverksanomali-detektion
+- `ais-lab1` - centraliserad säkerhetsövervakning med Wazuh, Docker, Python,
+  tcpdump och Wireshark.
+- `ais-lab2` - industriell säkerhetslabb med PLC, HMI, Modbus TCP,
+  IT/DMZ/OT-segmentering, Suricata och OT-incidentrespons.
+- `ML-Network-Anomaly-Detector` - grupprojekt med syntetiska nätverksflöden,
+  modelljämförelse, adversarial robusthetstest och SIEM/SOAR-integration.
 
-## Länkar
+## Rapportens huvudområden
+
+Rapporten behandlar:
+
+- min utveckling under kursen,
+- lärdomar från labb 1 och labb 2,
+- gruppprojektet ML Network Anomaly Detector,
+- AI:s roll i framtidens säkerhetsarbete,
+- OT/ICS, Zero Trust och helhetsperspektiv,
+- egna erfarenheter och framtida yrkesroll.
+
+## Relevanta länkar
 
 - GitHub-profil: <https://github.com/Itzmejonny92>
 - Slutreflektionsrepo: <https://github.com/Itzmejonny92/AIS-slutreflektion>
 - Grupprojektets projektsida: <https://m4k-reflect.vercel.app>
+- M4K Pipeline: <https://github.com/Mattej-Petrovic/M4K-Pipeline>
 - ML Network Anomaly Detector: <https://github.com/Mattej-Petrovic/ML-Network-Anomaly-Detector>
